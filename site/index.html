@@ -232,6 +232,11 @@ header, footer {
   border-radius:14px;
   transition:transform 0.15s ease;
   will-change: transform;
+  cursor: grab;
+}
+
+.square:active {
+  cursor: grabbing;
 }
 
 /* image fills square */
@@ -421,26 +426,23 @@ async function createSquare(imgName, linkFile, index){
   const img = document.createElement('img');
   img.src = 'IMAGES/' + imgName;
 
-  /* Position first */
+  /* Initial position */
   div.style.left = pos.x + 'px';
   div.style.top = pos.y + 'px';
 
-  /* 🔥 DEFAULT SIZE (fallback before image loads) */
   div.style.width = baseSize + 'px';
   div.style.height = baseSize + 'px';
 
-  /* 🔥 PRESERVE IMAGE RATIO */
+  /* 🔥 KEEP IMAGE RATIO */
   img.onload = () => {
     const ratio = img.naturalWidth / img.naturalHeight;
 
     let width, height;
 
     if (ratio > 1) {
-      // landscape image
       width = baseSize * 1.2;
       height = width / ratio;
     } else {
-      // portrait image
       height = baseSize * 1.2;
       width = height * ratio;
     }
@@ -449,21 +451,60 @@ async function createSquare(imgName, linkFile, index){
     div.style.height = height + 'px';
   };
 
-  /* fallback if image fails */
   img.onerror = () => {
     div.classList.add('fallback');
   };
 
-  /* 🔥 TRACK OBJECT FOR HOVER ANIMATION */
+  /* 🔥 OBJECT STATE */
   const squareObj = {
     el: div,
     x: pos.x,
     y: pos.y,
-    hover: false
+    hover: false,
+    dragging: false
   };
 
+  /* ================= HOVER ================= */
   div.addEventListener('mouseenter', () => squareObj.hover = true);
   div.addEventListener('mouseleave', () => squareObj.hover = false);
+
+  /* ================= DRAG SYSTEM ================= */
+
+  let offsetX = 0;
+  let offsetY = 0;
+
+  div.addEventListener('mousedown', (e) => {
+    squareObj.dragging = true;
+
+    offsetX = e.clientX - div.offsetLeft;
+    offsetY = e.clientY - div.offsetTop;
+
+    div.style.zIndex = 9999; // bring to front
+
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!squareObj.dragging) return;
+
+    const x = e.clientX - offsetX;
+    const y = e.clientY - offsetY;
+
+    div.style.left = x + 'px';
+    div.style.top = y + 'px';
+
+    squareObj.x = x;
+    squareObj.y = y;
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (squareObj.dragging) {
+      squareObj.dragging = false;
+      div.style.zIndex = '';
+    }
+  });
+
+  /* ================= LINK ================= */
 
   const a = document.createElement('a');
 
@@ -472,6 +513,13 @@ async function createSquare(imgName, linkFile, index){
     a.href = txt.trim();
     a.target = "_blank";
   } catch {}
+
+  /* prevent click if dragging */
+  a.addEventListener('click', (e) => {
+    if (squareObj.dragging) {
+      e.preventDefault();
+    }
+  });
 
   div.appendChild(img);
   div.appendChild(a);
