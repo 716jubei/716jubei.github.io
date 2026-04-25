@@ -233,6 +233,7 @@ header, footer {
   transition:transform 0.15s ease;
   will-change: transform;
   cursor: grab;
+  touch-action: none; /* 🔥 REQUIRED for mobile dragging */
 }
 
 .square:active {
@@ -470,22 +471,27 @@ async function createSquare(imgName, linkFile, index){
 
   /* ================= DRAG SYSTEM ================= */
 
+  /* ================= DRAG SYSTEM (DESKTOP + MOBILE) ================= */
+
   let offsetX = 0;
   let offsetY = 0;
+  let pointerId = null;
 
-  div.addEventListener('mousedown', (e) => {
+  div.addEventListener('pointerdown', (e) => {
     squareObj.dragging = true;
+    pointerId = e.pointerId;
 
     offsetX = e.clientX - div.offsetLeft;
     offsetY = e.clientY - div.offsetTop;
 
-    div.style.zIndex = 9999; // bring to front
+    div.setPointerCapture(pointerId);
+    div.style.zIndex = 9999;
 
     e.preventDefault();
   });
 
-  document.addEventListener('mousemove', (e) => {
-    if (!squareObj.dragging) return;
+  div.addEventListener('pointermove', (e) => {
+    if (!squareObj.dragging || e.pointerId !== pointerId) return;
 
     const x = e.clientX - offsetX;
     const y = e.clientY - offsetY;
@@ -497,11 +503,17 @@ async function createSquare(imgName, linkFile, index){
     squareObj.y = y;
   });
 
-  document.addEventListener('mouseup', () => {
-    if (squareObj.dragging) {
-      squareObj.dragging = false;
-      div.style.zIndex = '';
-    }
+  div.addEventListener('pointerup', (e) => {
+    if (e.pointerId !== pointerId) return;
+
+    squareObj.dragging = false;
+    div.releasePointerCapture(pointerId);
+    div.style.zIndex = '';
+  });
+
+  div.addEventListener('pointercancel', () => {
+    squareObj.dragging = false;
+    div.style.zIndex = '';
   });
 
   /* ================= LINK ================= */
@@ -513,6 +525,24 @@ async function createSquare(imgName, linkFile, index){
     a.href = txt.trim();
     a.target = "_blank";
   } catch {}
+
+  let wasDragging = false;
+
+  div.addEventListener('pointerdown', () => {
+    wasDragging = false;
+  });
+
+  div.addEventListener('pointermove', () => {
+    if (squareObj.dragging) {
+      wasDragging = true;
+    }
+  });
+
+  a.addEventListener('click', (e) => {
+    if (wasDragging) {
+      e.preventDefault(); // 🔥 stops accidental taps after drag
+    }
+  });
 
   /* prevent click if dragging */
   a.addEventListener('click', (e) => {
