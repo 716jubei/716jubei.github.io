@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Website Demo</title>
+
+<style>
+
+/* =========================================================
+   GLOBAL RESET / SAFETY
+   - Removes default margins
+   - Prevents horizontal scrolling issues
+   - Ensures consistent box sizing across elements
+========================================================= */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   MAIN PAGE LAYOUT
+   - Vertical layout: header / gallery / footer
+   - Full screen height
+========================================================= */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  text-transform: uppercase;
+  background:#111;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+  overflow:hidden;
+  position:relative;
+}
+
+/* =========================================================
+   BACKGROUND IMAGE LAYER
+   - Fixed full-screen background image
+   - Semi-transparent dark overlay for readability
+========================================================= */
+body::before {
+  content:"";
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background-image:url("IMAGES/ui/background.jpg");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  opacity:0.25;
+  z-index:-2;
+}
+
+body::after {
+  content:"";
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.45);
+  z-index:-1;
+}
+
+/* =========================================================
+   HEADER / FOOTER CONTAINERS
+========================================================= */
+header, footer {
+  background: transparent;
+  padding: 20px;
+}
+
+/* Header layout wrapper (centers logo + nav groups) */
+.header-inner {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  position:relative;
+}
+
+/* =========================================================
+   NAVIGATION GROUPS (LEFT / RIGHT)
+   - Positioned around logo on desktop
+========================================================= */
+.nav-group {
+  display:flex;
+  gap:18px;
+  position:absolute;
+}
+
+.nav-left {
+  right: calc(50% + 200px); /* pushes left group outward */
+}
+
+.nav-right {
+  left: calc(50% + 200px);  /* pushes right group outward */
+}
+
+/* =========================================================
+   HEADER ICONS
+========================================================= */
+.nav-img {
+  height: clamp(16px, 2vw, 28px); /* responsive scaling */
+  cursor: pointer;
+  opacity: 0.9;
+  transition: 0.2s;
+}
+
+/* hover animation for nav icons */
+.nav-img:hover {
+  transform: scale(1.05);
+  opacity: 1;
+}
+
+/* logo scales with screen size */
+.logo img {
+  height: clamp(100px, 12vw, 180px);
+  display:block;
+}
+
+/* =========================================================
+   FOOTER ICONS
+========================================================= */
+.footer-inner {
+  display:flex;
+  justify-content:center;
+  gap:14px;
+}
+
+/* social icons scale responsively */
+.social-icon-img {
+  width: clamp(24px, 2.8vw, 38px);
+  height: clamp(24px, 2.8vw, 38px);
+  object-fit: contain;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.social-icon-img:hover {
+  transform: scale(1.1);
+}
+
+/* =========================================================
+   MOBILE HEADER ADJUSTMENTS
+   - Removes absolute positioning
+   - Compresses icon sizes
+   - Prevents overflow
+========================================================= */
+@media (max-width: 700px) {
+
+  header {
+    padding: 10px;
+  }
+
+  .header-inner {
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  /* nav becomes normal flow (no absolute positioning) */
+  .nav-group {
+    position: static;
+    gap: 8px;
+  }
+
+  /* smaller icons for mobile */
+  .nav-img {
+    height: 14px;
+  }
+
+  .logo img {
+    height: 70px;
+  }
+
+  .social-icon-img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* =========================================================
+   GALLERY AREA
+========================================================= */
+
+#scroll-area {
+  position:relative;
+  flex:1;
+  overflow-y:auto;
+}
+
+/* container holds all floating squares */
+#container {
+  position:relative;
+  width:100%;
+}
+
+/* =========================================================
+   INDIVIDUAL SQUARES
+   - Positioned absolutely via JS
+   - Animated scaling on hover / scroll
+========================================================= */
+.square {
+  position:absolute;
+  overflow:hidden;
+  border-radius:14px;
+  transition:transform 0.15s ease;
+  will-change: transform;
+}
+
+/* image fills square */
+.square img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* fallback style if image fails */
+.square.fallback {
+  background: linear-gradient(135deg, #444, #222);
+  border: 1px solid #555;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* clickable link overlay */
+.square a {
+  position:absolute;
+  bottom:5px;
+  left:5px;
+  right:5px;
+  font-size:12px;
+  color:white;
+  text-decoration:none;
+  padding:4px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     HEADER STRUCTURE
+========================================================= -->
+<header>
+  <div class="header-inner">
+
+    <!-- left navigation group -->
+    <div class="nav-group nav-left">
+      <img src="IMAGES/ui/merch.png" class="nav-img" alt="MERCH">
+      <img src="IMAGES/ui/videos.png" class="nav-img" alt="VIDEOS">
+    </div>
+
+    <!-- centered logo -->
+    <div class="logo">
+      <img src="IMAGES/ui/logo.png" alt="LOGO">
+    </div>
+
+    <!-- right navigation group -->
+    <div class="nav-group nav-right">
+      <img src="IMAGES/ui/shows.png" class="nav-img" alt="SHOWS">
+      <img src="IMAGES/ui/music.png" class="nav-img" alt="MUSIC">
+    </div>
+
+  </div>
+</header>
+
+<!-- =========================================================
+     SCROLLING GALLERY CONTAINER
+========================================================= -->
+<div id="scroll-area">
+  <div id="container"></div>
+</div>
+
+<!-- =========================================================
+     FOOTER ICONS
+========================================================= -->
+<footer>
+  <div class="footer-inner">
+
+    <img src="IMAGES/social/ig.png" class="social-icon-img">
+    <img src="IMAGES/social/x.png" class="social-icon-img">
+    <img src="IMAGES/social/youtube.png" class="social-icon-img">
+    <img src="IMAGES/social/tiktok.png" class="social-icon-img">
+    <img src="IMAGES/social/discord.png" class="social-icon-img">
+
+  </div>
+</footer>
+
+<script>
+
+/* =========================================================
+   DOM REFERENCES
+========================================================= */
+const container = document.getElementById('container');
+const scrollArea = document.getElementById('scroll-area');
+
+/* stores all square objects for animation */
+let squares = [];
+
+/* stores responsive layout settings */
+let settings = getSettings();
+
+/* =========================================================
+   RESPONSIVE SETTINGS
+   - Adjusts layout based on screen size
+========================================================= */
+function getSettings() {
+  const mobile = window.innerWidth < 700;
+
+  return {
+    COLS: mobile ? 2 : 3,             // grid columns (desktop only used)
+    ROW_GAP: mobile ? 340 : 460,      // vertical spacing
+    COL_GAP: mobile ? 260 : 360,      // horizontal spacing (desktop)
+    TOP_OFFSET: 140                   // top padding for first row
+  };
+}
+
+/* =========================================================
+   POSITIONING LOGIC
+   - Desktop: grid layout
+   - Mobile: vertical stack layout
+========================================================= */
+function getSafePosition(index) {
+
+  const mobile = window.innerWidth < 700;
+
+  /* ================= MOBILE LAYOUT ================= */
+  if (mobile) {
+
+    const containerWidth = scrollArea.clientWidth;
+
+    return {
+      x: containerWidth / 2 - 80, // center alignment
+      y: settings.TOP_OFFSET + index * settings.ROW_GAP
+    };
+  }
+
+  /* ================= DESKTOP GRID LAYOUT ================= */
+  const col = index % settings.COLS;
+  const row = Math.floor(index / settings.COLS);
+
+  const containerWidth = scrollArea.clientWidth;
+
+  const usableWidth = containerWidth * 0.85 * 0.8;
+
+  let startX = (containerWidth - usableWidth) / 2;
+
+  const colSpacing = usableWidth / (settings.COLS - 1);
+
+  const x = startX + col * colSpacing;
+  const y = settings.TOP_OFFSET + row * settings.ROW_GAP;
+
+  return {
+    x,
+    y
+  };
+}
+
+/* =========================================================
+   LOAD DATA (IMAGES + LINKS)
+========================================================= */
+async function loadData(){
+
+  const res = await fetch('data.json');
+  const data = await res.json();
+
+  container.style.height = (scrollArea.clientHeight * 2) + 'px';
+
+  for (let i = 0; i < data.images.length; i++) {
+    createSquare(data.images[i], data.links[i], i);
+  }
+}
+
+/* =========================================================
+   CREATE INDIVIDUAL SQUARE
+========================================================= */
+async function createSquare(imgName, linkFile, index){
+
+  const baseSize = (160 + Math.random() * 120) * 0.8;
+  const pos = getSafePosition(index);
+
+  const div = document.createElement('div');
+  div.className = 'square';
+
+  const img = document.createElement('img');
+  img.src = 'IMAGES/' + imgName;
+
+  div.style.left = pos.x + 'px';
+  div.style.top = pos.y + 'px';
+
+  div.style.width = baseSize + 'px';
+  div.style.height = baseSize + 'px';
+
+  const a = document.createElement('a');
+
+  try {
+    const txt = await fetch('LINKS/' + linkFile).then(r => r.text());
+    a.href = txt.trim();
+    a.target = "_blank";
+  } catch {}
+
+  div.appendChild(img);
+  div.appendChild(a);
+  container.appendChild(div);
+
+  squares.push({ el: div, x: pos.x, y: pos.y, hover: false });
+}
+
+/* =========================================================
+   ANIMATION LOOP (hover scaling effect)
+========================================================= */
+function updateSquares(){
+
+  const center = scrollArea.clientHeight / 2;
+
+  squares.forEach(sq => {
+
+    let scale;
+
+    if (sq.hover) {
+      scale = 1.7; // zoom on hover
+    } else {
+      const d = Math.abs(center - sq.y);
+      const inf = Math.max(0, 1 - d / 450);
+      scale = 0.9 + inf * 0.6;
+    }
+
+    sq.el.style.transform = `scale(${scale})`;
+  });
+}
+
+/* infinite animation loop */
+function animate(){
+  updateSquares();
+  requestAnimationFrame(animate);
+}
+
+/* =========================================================
+   RESIZE HANDLER
+========================================================= */
+window.addEventListener('resize', () => {
+  settings = getSettings();
+  container.innerHTML = '';
+  squares = [];
+  loadData();
+});
+
+/* START APP */
+loadData();
+animate();
+
+</script>
+
+</body>
+</html>
