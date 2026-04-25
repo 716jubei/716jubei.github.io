@@ -99,6 +99,22 @@ header, footer {
   position:absolute;
 }
 
+/* 🔥 remove ALL default link styling */
+.nav-group a {
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+}
+
+/* prevent blue/purple/visited states */
+.nav-group a:link,
+.nav-group a:visited,
+.nav-group a:hover,
+.nav-group a:active {
+  text-decoration: none;
+  color: inherit;
+}
+
 .nav-left {
   right: calc(50% + 200px); /* pushes left group outward */
 }
@@ -257,10 +273,14 @@ header, footer {
 <header>
   <div class="header-inner">
 
-    <!-- left navigation group -->
+
     <div class="nav-group nav-left">
-      <img src="IMAGES/ui/merch.png" class="nav-img" alt="MERCH">
-      <img src="IMAGES/ui/videos.png" class="nav-img" alt="VIDEOS">
+      <a href="merch.html">
+        MERCH
+      </a>
+      <a href="videos.html">
+        VIDEOS
+      </a>
     </div>
 
     <!-- centered logo -->
@@ -268,10 +288,13 @@ header, footer {
       <img src="IMAGES/ui/logo.png" alt="LOGO">
     </div>
 
-    <!-- right navigation group -->
     <div class="nav-group nav-right">
-      <img src="IMAGES/ui/shows.png" class="nav-img" alt="SHOWS">
-      <img src="IMAGES/ui/music.png" class="nav-img" alt="MUSIC">
+      <a href="shows.html">
+        SHOWS
+      </a>
+      <a href="music.html">
+        MUSIC
+      </a>
     </div>
 
   </div>
