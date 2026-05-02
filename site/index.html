@@ -230,7 +230,7 @@ header, footer {
   position:absolute;
   overflow:hidden;
   border-radius:14px;
-  transition: transform 0.2s ease, opacity 0.25s ease;
+  transition: transform 0.2s ease, opacity 0.25s ease, left 0.35s ease, top 0.35s ease;
   will-change: transform;
   cursor: grab;
   touch-action: none; /* 🔥 REQUIRED for mobile dragging */
@@ -461,6 +461,10 @@ async function createSquare(imgName, linkFile, index){
     el: div,
     x: pos.x,
     y: pos.y,
+
+    originX: pos.x,   // ✅ NEW
+    originY: pos.y,   // ✅ NEW
+
     hover: false,
     dragging: false
   };
@@ -507,13 +511,28 @@ async function createSquare(imgName, linkFile, index){
     if (e.pointerId !== pointerId) return;
 
     squareObj.dragging = false;
+
     div.releasePointerCapture(pointerId);
     div.style.zIndex = '';
+
+    // ✅ animate back to original position
+    div.style.left = squareObj.originX + 'px';
+    div.style.top = squareObj.originY + 'px';
+
+    // reset internal position too
+    squareObj.x = squareObj.originX;
+    squareObj.y = squareObj.originY;
   });
 
   div.addEventListener('pointercancel', () => {
     squareObj.dragging = false;
     div.style.zIndex = '';
+
+    div.style.left = squareObj.originX + 'px';
+    div.style.top = squareObj.originY + 'px';
+
+    squareObj.x = squareObj.originX;
+    squareObj.y = squareObj.originY;
   });
 
   /* ================= LINK ================= */
