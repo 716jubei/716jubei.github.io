@@ -230,7 +230,7 @@ header, footer {
   position:absolute;
   overflow:hidden;
   border-radius:14px;
-  transition:transform 0.15s ease;
+  transition: transform 0.2s ease, opacity 0.25s ease;
   will-change: transform;
   cursor: grab;
   touch-action: none; /* 🔥 REQUIRED for mobile dragging */
@@ -562,21 +562,34 @@ async function createSquare(imgName, linkFile, index){
 ========================================================= */
 function updateSquares(){
 
-  const center = scrollArea.clientHeight / 2;
+  const scrollTop = scrollArea.scrollTop;
+  const viewportCenter = scrollTop + scrollArea.clientHeight / 2;
 
   squares.forEach(sq => {
 
+    const elTop = sq.y;
+    const distance = Math.abs(viewportCenter - elTop);
+
+    // how far before it disappears completely
+    const range = 500;
+
+    // normalized influence (0 → 1)
+    let influence = 1 - (distance / range);
+    influence = Math.max(0, Math.min(1, influence));
+
     let scale;
+    let opacity;
 
     if (sq.hover) {
-      scale = 1.7; // zoom on hover
+      scale = 1.7;
+      opacity = 1;
     } else {
-      const d = Math.abs(center - sq.y);
-      const inf = Math.max(0, 1 - d / 450);
-      scale = 0.9 + inf * 0.6;
+      scale = 0.6 + influence * 0.8;   // 0.6 → 1.4
+      opacity = 0.2 + influence * 0.8; // 0.2 → 1
     }
 
     sq.el.style.transform = `scale(${scale})`;
+    sq.el.style.opacity = opacity;
   });
 }
 
