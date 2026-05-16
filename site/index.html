@@ -440,7 +440,7 @@ async function loadData(){
 ========================================================= */
 async function createSquare(imgName, linkFile, index){
 
-  div.style.visibility = "hidden";
+  
   const baseSize = (160 + Math.random() * 120) * settings.SIZE_SCALE;
   const pos = getSafePosition(index);
 
@@ -490,7 +490,6 @@ async function createSquare(imgName, linkFile, index){
 
     hover: false,
     dragging: false
-    
   };
 
   /* ================= HOVER ================= */
@@ -599,10 +598,6 @@ async function createSquare(imgName, linkFile, index){
   container.appendChild(div);
 
   squares.push(squareObj);
-
-  requestAnimationFrame(() => {
-    div.style.visibility = "visible";
-  });
 }
 /* =========================================================
    ANIMATION LOOP (hover scaling effect)
