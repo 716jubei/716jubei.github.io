@@ -649,25 +649,25 @@ function animate(){
 /* =========================================================
    RESIZE HANDLER
 ========================================================= */
-let resizeTimeout;
-
 window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
+  if (isRebuilding) return;
 
-  resizeTimeout = setTimeout(() => {
-    if (isRebuilding) return;
+  isRebuilding = true;
 
-    isRebuilding = true;
+  // stop old animation frame from drawing old states
+  squares = [];
+  container.innerHTML = '';
 
-    squares = [];
-    container.innerHTML = '';
-    settings = getSettings();
+  settings = getSettings();
 
+  // force a clean rebuild after DOM settles
+  requestAnimationFrame(() => {
     loadData().then(() => {
       isRebuilding = false;
     });
-  }, 150);
+  });
 });
+
 /* START APP */
 loadData();
 animate();
