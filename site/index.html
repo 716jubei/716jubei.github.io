@@ -438,9 +438,9 @@ async function loadData(){
 /* =========================================================
    CREATE INDIVIDUAL SQUARE
 ========================================================= */
+
 async function createSquare(imgName, linkFile, index){
 
-  
   const baseSize = (160 + Math.random() * 120) * settings.SIZE_SCALE;
   const pos = getSafePosition(index);
 
@@ -449,6 +449,11 @@ async function createSquare(imgName, linkFile, index){
 
   const img = document.createElement('img');
   img.src = 'IMAGES/' + imgName;
+
+  const a = document.createElement('a');
+
+  /* 🔥 PREVENT MOBILE DOUBLE RENDER / FLASH */
+  div.style.opacity = "0";
 
   /* Initial position */
   div.style.left = pos.x + 'px';
@@ -479,14 +484,41 @@ async function createSquare(imgName, linkFile, index){
     div.classList.add('fallback');
   };
 
-  /* 🔥 OBJECT STATE */
+  /* ================= LINK ================= */
+
+  try {
+    const txt = await fetch('LINKS/' + linkFile).then(r => r.text());
+    a.href = txt.trim();
+    a.target = "_blank";
+  } catch {}
+
+  let wasDragging = false;
+
+  div.addEventListener('pointerdown', () => {
+    wasDragging = false;
+  });
+
+  div.addEventListener('pointermove', () => {
+    if (squareObj.dragging) {
+      wasDragging = true;
+    }
+  });
+
+  a.addEventListener('click', (e) => {
+    if (wasDragging) {
+      e.preventDefault();
+    }
+  });
+
+  /* ================= OBJECT STATE ================= */
+
   const squareObj = {
     el: div,
     x: pos.x,
     y: pos.y,
 
-    originX: pos.x,   // ✅ NEW
-    originY: pos.y,   // ✅ NEW
+    originX: pos.x,
+    originY: pos.y,
 
     hover: false,
     dragging: false
@@ -497,8 +529,6 @@ async function createSquare(imgName, linkFile, index){
   div.addEventListener('mouseleave', () => squareObj.hover = false);
 
   /* ================= DRAG SYSTEM ================= */
-
-  /* ================= DRAG SYSTEM (DESKTOP + MOBILE) ================= */
 
   let offsetX = 0;
   let offsetY = 0;
@@ -538,11 +568,9 @@ async function createSquare(imgName, linkFile, index){
     div.releasePointerCapture(pointerId);
     div.style.zIndex = '';
 
-    // ✅ animate back to original position
     div.style.left = squareObj.originX + 'px';
     div.style.top = squareObj.originY + 'px';
 
-    // reset internal position too
     squareObj.x = squareObj.originX;
     squareObj.y = squareObj.originY;
   });
@@ -558,47 +586,20 @@ async function createSquare(imgName, linkFile, index){
     squareObj.y = squareObj.originY;
   });
 
-  /* ================= LINK ================= */
-
-  const a = document.createElement('a');
-
-  try {
-    const txt = await fetch('LINKS/' + linkFile).then(r => r.text());
-    a.href = txt.trim();
-    a.target = "_blank";
-  } catch {}
-
-  let wasDragging = false;
-
-  div.addEventListener('pointerdown', () => {
-    wasDragging = false;
-  });
-
-  div.addEventListener('pointermove', () => {
-    if (squareObj.dragging) {
-      wasDragging = true;
-    }
-  });
-
-  a.addEventListener('click', (e) => {
-    if (wasDragging) {
-      e.preventDefault(); // 🔥 stops accidental taps after drag
-    }
-  });
-
-  /* prevent click if dragging */
-  a.addEventListener('click', (e) => {
-    if (squareObj.dragging) {
-      e.preventDefault();
-    }
-  });
+  /* ================= APPEND ================= */
 
   div.appendChild(img);
   div.appendChild(a);
   container.appendChild(div);
 
   squares.push(squareObj);
+
+  /* 🔥 SHOW AFTER FULL RENDER (fixes mobile double-image bug) */
+  requestAnimationFrame(() => {
+    div.style.opacity = "1";
+  });
 }
+
 /* =========================================================
    ANIMATION LOOP (hover scaling effect)
 ========================================================= */
@@ -637,7 +638,9 @@ function updateSquares(){
 
 /* infinite animation loop */
 function animate(){
-  updateSquares();
+  if (squares.length > 0) {
+    updateSquares();
+  }
   requestAnimationFrame(animate);
 }
 
@@ -649,13 +652,12 @@ window.addEventListener('resize', () => {
 
   isRebuilding = true;
 
-  // stop old animation frame from drawing old states
   squares = [];
-  container.innerHTML = '';
+  container.innerHTML = "";
 
   settings = getSettings();
 
-  // force a clean rebuild after DOM settles
+  // wait 1 frame so DOM actually clears before rebuilding
   requestAnimationFrame(() => {
     loadData().then(() => {
       isRebuilding = false;
