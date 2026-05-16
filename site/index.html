@@ -355,6 +355,7 @@ let squares = [];
 
 /* stores responsive layout settings */
 let settings = getSettings();
+let isRebuilding = false;
 
 /* =========================================================
    RESPONSIVE SETTINGS
@@ -439,6 +440,7 @@ async function loadData(){
 ========================================================= */
 async function createSquare(imgName, linkFile, index){
 
+  div.style.visibility = "hidden";
   const baseSize = (160 + Math.random() * 120) * settings.SIZE_SCALE;
   const pos = getSafePosition(index);
 
@@ -488,6 +490,7 @@ async function createSquare(imgName, linkFile, index){
 
     hover: false,
     dragging: false
+    
   };
 
   /* ================= HOVER ================= */
@@ -596,6 +599,10 @@ async function createSquare(imgName, linkFile, index){
   container.appendChild(div);
 
   squares.push(squareObj);
+
+  requestAnimationFrame(() => {
+    div.style.visibility = "visible";
+  });
 }
 /* =========================================================
    ANIMATION LOOP (hover scaling effect)
@@ -642,13 +649,25 @@ function animate(){
 /* =========================================================
    RESIZE HANDLER
 ========================================================= */
-window.addEventListener('resize', () => {
-  settings = getSettings();
-  container.innerHTML = '';
-  squares = [];
-  loadData();
-});
+let resizeTimeout;
 
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+
+  resizeTimeout = setTimeout(() => {
+    if (isRebuilding) return;
+
+    isRebuilding = true;
+
+    squares = [];
+    container.innerHTML = '';
+    settings = getSettings();
+
+    loadData().then(() => {
+      isRebuilding = false;
+    });
+  }, 150);
+});
 /* START APP */
 loadData();
 animate();
