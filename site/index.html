@@ -360,10 +360,17 @@ function getSettings() {
   const mobile = window.innerWidth < 700;
 
   return {
-    COLS: mobile ? 2 : 3,             // grid columns (desktop only used)
-    ROW_GAP: mobile ? 220 : 460,     // vertical spacing
-    COL_GAP: mobile ? 260 : 360,      // horizontal spacing (desktop)
-    TOP_OFFSET: mobile ? 40 : 140                   // top padding for first row
+    COLS: mobile ? 2 : 3,
+
+    // tighter mobile spacing
+    ROW_GAP: mobile ? 150 : 460,
+    COL_GAP: mobile ? 180 : 360,
+
+    // less top padding on mobile
+    TOP_OFFSET: mobile ? 10 : 140,
+
+    // NEW: mobile size scale
+    SIZE_SCALE: mobile ? 0.7 : 0.8
   };
 }
 
@@ -428,7 +435,7 @@ async function loadData(){
 ========================================================= */
 async function createSquare(imgName, linkFile, index){
 
-  const baseSize = (160 + Math.random() * 120) * 0.8;
+  const baseSize = (160 + Math.random() * 120) * settings.SIZE_SCALE;
   const pos = getSafePosition(index);
 
   const div = document.createElement('div');
