@@ -200,7 +200,7 @@ header, footer {
   }
 
   .logo img {
-    height: clamp(35px, 6vw, 35px);
+    height: clamp(28px, 6vw, 28px);
     display:block;
 
   }
@@ -208,6 +208,10 @@ header, footer {
   .social-icon-img {
     width: 32px;
     height: 32px;
+  }
+
+  #scroll-area {
+    padding-bottom: 20px;
   }
 }
 
@@ -357,9 +361,9 @@ function getSettings() {
 
   return {
     COLS: mobile ? 2 : 3,             // grid columns (desktop only used)
-    ROW_GAP: mobile ? 340 : 460,      // vertical spacing
+    ROW_GAP: mobile ? 220 : 460,     // vertical spacing
     COL_GAP: mobile ? 260 : 360,      // horizontal spacing (desktop)
-    TOP_OFFSET: 140                   // top padding for first row
+    TOP_OFFSET: mobile ? 40 : 140                   // top padding for first row
   };
 }
 
