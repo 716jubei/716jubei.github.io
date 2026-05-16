@@ -36,7 +36,7 @@ body {
   color:white;
   display:flex;
   flex-direction:column;
-  height:100vh;
+  min-height:100vh;
   overflow:hidden;
   position:relative;
 }
@@ -211,8 +211,12 @@ header, footer {
   }
 
   #scroll-area {
-    padding-bottom: 20px;
+    flex: 0 1 auto;   /* stop forcing full stretch */
+    max-height: 100vh; /* limits gallery height */
+    overflow-y: auto;
+    
   }
+
 }
 
 /* =========================================================
@@ -363,8 +367,8 @@ function getSettings() {
     COLS: mobile ? 2 : 3,
 
     // tighter mobile spacing
-    ROW_GAP: mobile ? 150 : 460,
-    COL_GAP: mobile ? 180 : 360,
+    ROW_GAP: mobile ? 280 : 460,
+    COL_GAP: mobile ? 300 : 360,
 
     // less top padding on mobile
     TOP_OFFSET: mobile ? 10 : 140,
@@ -423,7 +427,7 @@ async function loadData(){
   const res = await fetch('data.json');
   const data = await res.json();
 
-  container.style.height = (scrollArea.clientHeight * 2) + 'px';
+  container.style.height = (data.images.length * 220) + 'px';
 
   for (let i = 0; i < data.images.length; i++) {
     createSquare(data.images[i], data.links[i], i);
