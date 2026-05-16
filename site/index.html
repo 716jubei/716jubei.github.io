@@ -140,9 +140,13 @@ header, footer {
 }
 
 /* logo scales with screen size */
+.logo {
+  position: relative;
+}
 .logo img {
-  height: clamp(100px, 12vw, 180px);
-  display:block;
+  height: 110px;
+  width: auto;
+  display: block;
 }
 
 /* =========================================================
@@ -156,8 +160,8 @@ header, footer {
 
 /* social icons scale responsively */
 .social-icon-img {
-  width: clamp(24px, 2.8vw, 38px);
-  height: clamp(24px, 2.8vw, 38px);
+  width: clamp(60px, 2.8vw, 38px);
+  height: clamp(60px, 2.8vw, 38px);
   object-fit: contain;
   cursor: pointer;
   transition: 0.2s;
@@ -196,12 +200,14 @@ header, footer {
   }
 
   .logo img {
-    height: 70px;
+    height: clamp(70px, 6vw, 70px);
+    display:block;
+
   }
 
   .social-icon-img {
-    width: 24px;
-    height: 24px;
+    width: 52px;
+    height: 52px;
   }
 }
 
