@@ -36,7 +36,7 @@ body {
   color:white;
   display:flex;
   flex-direction:column;
-  height:100vh;
+  min-height:100vh;
   overflow:hidden;
   position:relative;
 }
@@ -77,7 +77,15 @@ body::after {
 ========================================================= */
 header, footer {
   background: transparent;
-  padding: 20px;
+  padding: 3px 13px;
+}
+
+header {
+  padding-bottom: 12px;
+}
+
+footer {
+  padding-top: 25px;
 }
 
 /* Header layout wrapper (centers logo + nav groups) */
@@ -138,11 +146,18 @@ header, footer {
   transform: scale(1.05);
   opacity: 1;
 }
+.youtube-icon:hover{
+  transform: scale(1.95);
+}
 
 /* logo scales with screen size */
+.logo {
+  position: relative;
+}
 .logo img {
-  height: clamp(100px, 12vw, 180px);
-  display:block;
+  height: 110px;
+  width: auto;
+  display: block;
 }
 
 /* =========================================================
@@ -156,8 +171,8 @@ header, footer {
 
 /* social icons scale responsively */
 .social-icon-img {
-  width: clamp(24px, 2.8vw, 38px);
-  height: clamp(24px, 2.8vw, 38px);
+  width: clamp(60px, 2.8vw, 38px);
+  height: clamp(60px, 2.8vw, 38px);
   object-fit: contain;
   cursor: pointer;
   transition: 0.2s;
@@ -166,6 +181,25 @@ header, footer {
 .social-icon-img:hover {
   transform: scale(1.1);
 }
+
+.youtube-icon{
+  transform: scale(1.9);
+}
+.tiktok-icon {
+  transform: scale(1.1);
+}
+.tiktok-icon:hover {
+  transform: scale(1.15);
+}
+.youtube-icon:hover{
+  transform: scale(1.95);
+}
+#scroll-area {
+    flex: 0 1 auto;   /* stop forcing full stretch */
+    max-height: 74vh; /* limits gallery height */
+    overflow-y: auto;
+    
+  }
 
 /* =========================================================
    MOBILE HEADER ADJUSTMENTS
@@ -176,18 +210,19 @@ header, footer {
 @media (max-width: 700px) {
 
   header {
-    padding: 10px;
+    padding: 3px;
+    padding-top: 10px;
   }
 
   .header-inner {
     justify-content: space-between;
-    gap: 8px;
+    gap: 1px;
   }
 
   /* nav becomes normal flow (no absolute positioning) */
   .nav-group {
     position: static;
-    gap: 8px;
+    gap: 4px;
   }
 
   /* smaller icons for mobile */
@@ -196,13 +231,23 @@ header, footer {
   }
 
   .logo img {
-    height: 70px;
+    height: clamp(39px, 0vw, 33px);
+    display:block;
+
   }
 
   .social-icon-img {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
   }
+
+  #scroll-area {
+    flex: 0 1 auto;   /* stop forcing full stretch */
+    max-height: 74vh; /* limits gallery height */
+    overflow-y: auto;
+    
+  }
+
 }
 
 /* =========================================================
@@ -230,7 +275,7 @@ header, footer {
   position:absolute;
   overflow:hidden;
   border-radius:14px;
-  transition:transform 0.15s ease;
+  transition: transform 0.2s ease, opacity 0.25s ease, left 0.35s ease, top 0.35s ease;
   will-change: transform;
   cursor: grab;
   touch-action: none; /* 🔥 REQUIRED for mobile dragging */
@@ -277,6 +322,7 @@ header, footer {
      HEADER STRUCTURE
 ========================================================= -->
 <header>
+  <br>
   <div class="header-inner">
 
 
@@ -321,8 +367,14 @@ header, footer {
 
     <a href="https://www.instagram.com/dashgeorge/"><img src="IMAGES/social/ig.png" class="social-icon-img"></a>
     <a href="https://music.apple.com/us/album/heads-up-single/1779572180?at=1001lwQy&ct=FFM_47043ea03a99cde8879d1b50e1d68cf1&ls=1&uo=4"><img src="IMAGES/social/x.png" class="social-icon-img"></a>
-    <a href="https://music.youtube.com/playlist?list=OLAK5uy_lkCsOE1XZhOeQZ1gTLZsvcWVZa_HD_6Yk"><img src="IMAGES/social/youtube.png" class="social-icon-img"></a>
-    <a href="https://www.tiktok.com/@outsiderdash?is_from_webapp=1&sender_device=pc"><img src="IMAGES/social/tiktok.png" class="social-icon-img"></a>
+    
+    <a href="https://music.youtube.com/playlist?list=OLAK5uy_lkCsOE1XZhOeQZ1gTLZsvcWVZa_HD_6Yk">
+      <img src="IMAGES/social/youtube.png" class="social-icon-img youtube-icon">
+    </a>
+
+    <a href="https://www.tiktok.com/@outsiderdash?is_from_webapp=1&sender_device=pc">
+      <img src="IMAGES/social/tiktok.png" class="social-icon-img tiktok-icon">
+    </a>
     <a href="https://open.spotify.com/album/20NFLKQUVojia7LVI1O3Ao"><img src="IMAGES/social/discord.png" class="social-icon-img"></a>
 
   </div>
@@ -341,6 +393,7 @@ let squares = [];
 
 /* stores responsive layout settings */
 let settings = getSettings();
+let isRebuilding = false;
 
 /* =========================================================
    RESPONSIVE SETTINGS
@@ -350,10 +403,17 @@ function getSettings() {
   const mobile = window.innerWidth < 700;
 
   return {
-    COLS: mobile ? 2 : 3,             // grid columns (desktop only used)
-    ROW_GAP: mobile ? 340 : 460,      // vertical spacing
-    COL_GAP: mobile ? 260 : 360,      // horizontal spacing (desktop)
-    TOP_OFFSET: 140                   // top padding for first row
+    COLS: mobile ? 2 : 3,
+
+    /* MUCH LARGER SPACING */
+    ROW_GAP: mobile ? 420 : 700,
+    COL_GAP: mobile ? 260 : 520,
+
+    /* pushes everything downward slightly */
+    TOP_OFFSET: mobile ? 40 : 180,
+
+    /* slightly larger objects */
+    SIZE_SCALE: mobile ? 0.8 : 0.95
   };
 }
 
@@ -383,14 +443,22 @@ function getSafePosition(index) {
 
   const containerWidth = scrollArea.clientWidth;
 
-  const usableWidth = containerWidth * 0.85 * 0.8;
+  /* wider spread */
+  const totalWidth = settings.COL_GAP * (settings.COLS - 1);
+  const startX = (containerWidth - totalWidth) / 2;
 
-  let startX = (containerWidth - usableWidth) / 2;
+  const randomOffsetX = (Math.random() - 0.5) * 120;
+  const randomOffsetY = (Math.random() - 0.5) * 160;
 
-  const colSpacing = usableWidth / (settings.COLS - 1);
+  const x =
+    startX +
+    col * settings.COL_GAP +
+    randomOffsetX;
 
-  const x = startX + col * colSpacing;
-  const y = settings.TOP_OFFSET + row * settings.ROW_GAP;
+  const y =
+    settings.TOP_OFFSET +
+    row * settings.ROW_GAP +
+    randomOffsetY;
 
   return {
     x,
@@ -406,7 +474,8 @@ async function loadData(){
   const res = await fetch('data.json');
   const data = await res.json();
 
-  container.style.height = (scrollArea.clientHeight * 2) + 'px';
+  container.style.height =
+  (Math.ceil(data.images.length / settings.COLS) * settings.ROW_GAP + 1200) + 'px';
 
   for (let i = 0; i < data.images.length; i++) {
     createSquare(data.images[i], data.links[i], i);
@@ -416,9 +485,10 @@ async function loadData(){
 /* =========================================================
    CREATE INDIVIDUAL SQUARE
 ========================================================= */
+
 async function createSquare(imgName, linkFile, index){
 
-  const baseSize = (160 + Math.random() * 120) * 0.8;
+  const baseSize = (160 + Math.random() * 120) * settings.SIZE_SCALE;
   const pos = getSafePosition(index);
 
   const div = document.createElement('div');
@@ -426,6 +496,11 @@ async function createSquare(imgName, linkFile, index){
 
   const img = document.createElement('img');
   img.src = 'IMAGES/' + imgName;
+
+  const a = document.createElement('a');
+
+  /* 🔥 PREVENT MOBILE DOUBLE RENDER / FLASH */
+  div.style.opacity = "0";
 
   /* Initial position */
   div.style.left = pos.x + 'px';
@@ -456,11 +531,42 @@ async function createSquare(imgName, linkFile, index){
     div.classList.add('fallback');
   };
 
-  /* 🔥 OBJECT STATE */
+  /* ================= LINK ================= */
+
+  try {
+    const txt = await fetch('LINKS/' + linkFile).then(r => r.text());
+    a.href = txt.trim();
+    a.target = "_blank";
+  } catch {}
+
+  let wasDragging = false;
+
+  div.addEventListener('pointerdown', () => {
+    wasDragging = false;
+  });
+
+  div.addEventListener('pointermove', () => {
+    if (squareObj.dragging) {
+      wasDragging = true;
+    }
+  });
+
+  a.addEventListener('click', (e) => {
+    if (wasDragging) {
+      e.preventDefault();
+    }
+  });
+
+  /* ================= OBJECT STATE ================= */
+
   const squareObj = {
     el: div,
     x: pos.x,
     y: pos.y,
+
+    originX: pos.x,
+    originY: pos.y,
+
     hover: false,
     dragging: false
   };
@@ -470,8 +576,6 @@ async function createSquare(imgName, linkFile, index){
   div.addEventListener('mouseleave', () => squareObj.hover = false);
 
   /* ================= DRAG SYSTEM ================= */
-
-  /* ================= DRAG SYSTEM (DESKTOP + MOBILE) ================= */
 
   let offsetX = 0;
   let offsetY = 0;
@@ -507,82 +611,83 @@ async function createSquare(imgName, linkFile, index){
     if (e.pointerId !== pointerId) return;
 
     squareObj.dragging = false;
+
     div.releasePointerCapture(pointerId);
     div.style.zIndex = '';
+
+    div.style.left = squareObj.originX + 'px';
+    div.style.top = squareObj.originY + 'px';
+
+    squareObj.x = squareObj.originX;
+    squareObj.y = squareObj.originY;
   });
 
   div.addEventListener('pointercancel', () => {
     squareObj.dragging = false;
     div.style.zIndex = '';
+
+    div.style.left = squareObj.originX + 'px';
+    div.style.top = squareObj.originY + 'px';
+
+    squareObj.x = squareObj.originX;
+    squareObj.y = squareObj.originY;
   });
 
-  /* ================= LINK ================= */
-
-  const a = document.createElement('a');
-
-  try {
-    const txt = await fetch('LINKS/' + linkFile).then(r => r.text());
-    a.href = txt.trim();
-    a.target = "_blank";
-  } catch {}
-
-  let wasDragging = false;
-
-  div.addEventListener('pointerdown', () => {
-    wasDragging = false;
-  });
-
-  div.addEventListener('pointermove', () => {
-    if (squareObj.dragging) {
-      wasDragging = true;
-    }
-  });
-
-  a.addEventListener('click', (e) => {
-    if (wasDragging) {
-      e.preventDefault(); // 🔥 stops accidental taps after drag
-    }
-  });
-
-  /* prevent click if dragging */
-  a.addEventListener('click', (e) => {
-    if (squareObj.dragging) {
-      e.preventDefault();
-    }
-  });
+  /* ================= APPEND ================= */
 
   div.appendChild(img);
   div.appendChild(a);
   container.appendChild(div);
 
   squares.push(squareObj);
+
+  /* 🔥 SHOW AFTER FULL RENDER (fixes mobile double-image bug) */
+  requestAnimationFrame(() => {
+    div.style.opacity = "1";
+  });
 }
+
 /* =========================================================
    ANIMATION LOOP (hover scaling effect)
 ========================================================= */
 function updateSquares(){
 
-  const center = scrollArea.clientHeight / 2;
+  const scrollTop = scrollArea.scrollTop;
+  const viewportCenter = scrollTop + scrollArea.clientHeight / 2;
 
   squares.forEach(sq => {
 
+    const elTop = sq.y;
+    const distance = Math.abs(viewportCenter - elTop);
+
+    // how far before it disappears completely
+    const range = 500;
+
+    // normalized influence (0 → 1)
+    let influence = 1 - (distance / range);
+    influence = Math.max(0, Math.min(1, influence));
+
     let scale;
+    let opacity;
 
     if (sq.hover) {
-      scale = 1.7; // zoom on hover
+      scale = 1.7;
+      opacity = 1;
     } else {
-      const d = Math.abs(center - sq.y);
-      const inf = Math.max(0, 1 - d / 450);
-      scale = 0.9 + inf * 0.6;
+      scale = 0.6 + influence * 0.8;   // 0.6 → 1.4
+      opacity = 0.2 + influence * 0.8; // 0.2 → 1
     }
 
     sq.el.style.transform = `scale(${scale})`;
+    sq.el.style.opacity = opacity;
   });
 }
 
 /* infinite animation loop */
 function animate(){
-  updateSquares();
+  if (squares.length > 0) {
+    updateSquares();
+  }
   requestAnimationFrame(animate);
 }
 
@@ -590,10 +695,21 @@ function animate(){
    RESIZE HANDLER
 ========================================================= */
 window.addEventListener('resize', () => {
-  settings = getSettings();
-  container.innerHTML = '';
+  if (isRebuilding) return;
+
+  isRebuilding = true;
+
   squares = [];
-  loadData();
+  container.innerHTML = "";
+
+  settings = getSettings();
+
+  // wait 1 frame so DOM actually clears before rebuilding
+  requestAnimationFrame(() => {
+    loadData().then(() => {
+      isRebuilding = false;
+    });
+  });
 });
 
 /* START APP */
