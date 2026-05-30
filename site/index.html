@@ -448,7 +448,11 @@ function getSafePosition(index) {
 
   /* wider spread */
   const totalWidth = settings.COL_GAP * (settings.COLS - 1);
-  const startX = (containerWidth - totalWidth) / 2;
+  const HORIZONTAL_SHIFT = -0.15 * containerWidth;
+
+  const startX =
+     (containerWidth - totalWidth) / 2 +
+     HORIZONTAL_SHIFT;
 
   const randomOffsetX = (Math.random() - 0.5) * 120;
   const randomOffsetY = (Math.random() - 0.5) * 160;
