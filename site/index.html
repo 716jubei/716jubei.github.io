@@ -37,7 +37,7 @@ body {
   display:flex;
   flex-direction:column;
   min-height:100vh;
-  overflow:hidden;
+  overflow-x:hidden;
   position:relative;
 }
 
@@ -304,6 +304,9 @@ footer {
 /* clickable link overlay */
 .square a {
   position:absolute;
+  inset:0;
+  display:block;
+  z-index:2;
   bottom:5px;
   left:5px;
   right:5px;
@@ -450,10 +453,16 @@ function getSafePosition(index) {
   const randomOffsetX = (Math.random() - 0.5) * 120;
   const randomOffsetY = (Math.random() - 0.5) * 160;
 
-  const x =
-    startX +
-    col * settings.COL_GAP +
-    randomOffsetX;
+  const GALLERY_SHIFT_RIGHT = 40;
+
+  let x =
+  startX +
+  col * settings.COL_GAP +
+  randomOffsetX +
+  GALLERY_SHIFT_RIGHT;
+
+  x = Math.max(20, x);
+  x = Math.min(containerWidth - 220, x);
 
   const y =
     settings.TOP_OFFSET +
@@ -552,9 +561,10 @@ async function createSquare(imgName, linkFile, index){
   });
 
   a.addEventListener('click', (e) => {
-    if (wasDragging) {
-      e.preventDefault();
-    }
+     if (wasDragging || squareObj.dragging) {
+       e.preventDefault();
+       e.stopPropagation();
+     }
   });
 
   /* ================= OBJECT STATE ================= */
@@ -635,8 +645,13 @@ async function createSquare(imgName, linkFile, index){
 
   /* ================= APPEND ================= */
 
-  div.appendChild(img);
-  div.appendChild(a);
+  if (a.href) {
+     a.appendChild(img);
+     div.appendChild(a);
+  } else {
+     div.appendChild(img);
+  }
+   
   container.appendChild(div);
 
   squares.push(squareObj);
